@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Rutas</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!--
+    <link rel="stylesheet" href="css/jquery.mobile-1.4.5.css" />
+    <script src="js/externo/jquery-1.11.1.min.js"></script>
+    <script src="js/externo/jquery.mobile-1.4.5.js"></script> 
+    -->
+
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.css" />
+
+    <!--
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.4.0/video-js.css">    
+    <link rel="stylesheet" src="js/externo/VideoJSRecord/css/videojs.record.css"/>
+    <link rel="stylesheet" src="js/externo/VideoJsWavesurfer/css/videojs.wavesurfer.css"/>
+    -->
+    <link rel="stylesheet" href="css/styles.css"/>
+
+    <!--script src="bower_components/webcamjs/webcam.min.js"></script-->
+
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.js"></script>
+
+    <!-- script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.4.0/wavesurfer.js"></script-->
+    <!-- script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/6.4.0/video.js"></script -->
+    <!-- script src="bower_components/webrtc-adapter/release/adapter.js"></script -->
+    <!-- script src="bower_components/recordrtc/RecordRTC.js"></script-->
+
+    <!-- script src="js/externo/VideoJSRecord/videojs.record.js"></script -->
+    <!--script src="js/externo/VideoJsWavesurfer/videojs.wavesurfer.js"></script-->
+  
+
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js? sensor=false"></script>
+    <script type="text/javascript" src="js/modelo.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+</head>
+
+<body>
+    <div id="pgHome" data-role="page">
+        <div data-role="header">
+            <h1>Mis rutas</h1>
+        </div>
+        <div class="ui-content"></div>
+        <input id="txtTitulo" type="text" placeholder="T&iacute;tulo">
+        <input id="btGrabar" type="button" value="Empezar Ruta">
+        <div id="pnInfo">
+            <p id="lblInfo"> Grabando ruta XXX</p>
+            <p id="lblReloj"> 00:00:00 </p>
+        </div>
+
+        <table class="attachMenu">
+            <tbody>
+                <tr>
+                    <td>
+                        <a class="ui-btn" href="#pgTakeImage">Photo</a>
+                    </td>
+                    <td>
+                        <button >Video</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button >Note</button>
+                    </td>
+                    <td>
+                        <button>Audio</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <a>
+            <img>
+        </a>
+
+        <div data-role="footer" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li>
+                        <a href="#pgHome" class="ui-btn-active ui-state-persist" data-icon="home">Principal</a>
+                    </li>
+                    <li>
+                        <a href="#pgMisRutas" data-icon="search">Mis rutas</a>
+                    </li>
+                    <li>
+                        <a href="#pgMapa" data-icon="navigation">Mapa</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="pgMisRutas" data-role="page">
+        <div data-role="header">
+            <h1>Mis rutas</h1>
+        </div>
+        <div class="ui-content"></div>
+        <div id="pnRutas">
+            <ul data-role="listview" data-filter="true">
+                <li>
+                    <a id="1" href="#">Ruta 1</a>
+                </li>
+                <li>
+                    <a id="2" href="#">Ruta 2</a>
+                </li>
+                <li>
+                    <a id="3" href="#">Ruta 3</a>
+                </li>
+                <li>
+                    <a id="4" href="#">Ruta 4</a>
+                </li>
+            </ul>
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li>
+                        <a href="#pgHome" data-icon="home">Principal</a>
+                    </li>
+                    <li>
+                        <a href="#pgMisRutas" class="ui-btn-active ui-state-persist" data-icon="search">Mis rutas</a>
+                    </li>
+                    <li>
+                        <a href="#pgMapa" data-icon="navigation">Mapa</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="pgEditarRuta" data-role="page">
+        <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
+            <h1>Editar Ruta</h1>
+        </div>
+        <div class="ui-content">
+            <input id="txtEditarTitulo" type="text">
+            <input id="txtEditarFecha" type="text" disabled>
+            <input id="txtEditarColor" type="color">
+            <label for="txtEditarVisualizar">Visualizar:</label>
+            <select id="txtEditarVisualizar" data-role="flipswitch">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+            <input id="btBorrar" type="button" value="Borrar"> 
+        </div>
+    </div>
+
+    <div id="pgMapa" data-role="page">
+        <div data-role="header">
+            <h1>Mis rutas</h1>
+        </div>
+        <div class="ui-content">
+            <div id="pnMapa"></div>
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li>
+                        <a href="#pgHome" data-icon="home">Principal</a>
+                    </li>
+                    <li>
+                        <a href="#pgMisRutas" data-icon="search">Mis rutas</a>
+                    </li>
+                    <li>
+                        <a href="#pgMapa" data-icon="navigation" class="ui-btn-active ui-state-persist">Mapa</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="pgTakeImage" data-role="page">
+        <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
+                <h1>Tomar Imagen</h1>
+            </div>
+            <div class="ui-content">
+
+                <div class="camera">
+                    <video id="video">Video stream not available.</video>
+                </div>
+                <canvas id="canvas">
+                </canvas>
+                <div class="output">
+                    <img id="photo" alt="The screen capture will appear in this box."> 
+                </div>
+
+            </div>
+            <input type="file" accept="image/*;capture=camera">
+            <button id="flip">Flip</button>
+            <button id="takeSnapshot">Take Snapshot</button>
+    </div>
+
+</body>
+
+</html>

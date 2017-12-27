@@ -1,0 +1,19 @@
+{
+  "name": "MisRutas",
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "webcamjs": "^1.0.23",
+    "videojs-record": "^2.0.4"
+  }
+}
