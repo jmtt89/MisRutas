@@ -25,7 +25,13 @@
 
 .camera {
   width: 340px;
-  display:inline-block;
+  display: block;
+  margin: 0 auto;
+}
+
+#videoPreview, #audioPreview{
+  width: 100%;
+  height: auto;
 }
 
 .output {

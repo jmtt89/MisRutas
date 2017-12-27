@@ -218,12 +218,6 @@ function inicializarRecordVideo(){
     
         // read the image file as a data URL.
         reader.readAsDataURL(this.files[0]);
-        /*
-        var fileInput = document.getElementById('inputVideo');
-        var fileUrl = window.URL.createObjectURL(fileInput.files[0]);
-        console.log(fileUrl);
-        $("#videoPreview").attr("src", fileUrl);
-        */
     };
 }
 
@@ -236,10 +230,13 @@ function inicializarRecordAudio(){
     });
 
     document.getElementById("inputAudio").onchange = function () {
-        var fileInput = document.getElementById('inputAudio');
-        var fileUrl = window.URL.createObjectURL(fileInput.files[0]);
-        console.log(fileUrl);
-        $("#audioPreview").attr("src", fileUrl);
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            // get loaded data and render thumbnail.
+            document.getElementById("audioPreview").src = e.target.result;
+        };
+        // read the image file as a data URL.
+        reader.readAsDataURL(this.files[0]);
     };
 }
 

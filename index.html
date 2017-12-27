@@ -209,7 +209,9 @@
             <h1>Grabar nota de voz</h1>
         </div>
         <div class="ui-content">
-            <audio id="audioPreview"></audio>
+            <div class="camera">
+                <audio id="audioPreview" controls></audio>
+            </div>
         </div>
         <button id="recAudio">Record Audio</button>
         <input id="inputAudio" style="display:none" type="file" accept="audio/*;capture=microphone">
