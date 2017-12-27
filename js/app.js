@@ -174,6 +174,76 @@ function inicializarTakeImage(){
 */
 
 function inicializarTakeImage(){
+    console.log('inicializarTakeImage()');
+    video = $('#video');
+    canvas = $('#canvas');
+    photo = $('#photo');
+
+    video.hide();
+    canvas.hide();
+
+    $("#takeSnapshot").click(function(event){
+        $("#inputSnapshot").click();
+        event.preventDefault();
+    });
+
+    document.getElementById("inputSnapshot").onchange = function () {
+        var reader = new FileReader();
+    
+        reader.onload = function (e) {
+            // get loaded data and render thumbnail.
+            document.getElementById("photo").src = e.target.result;
+        };
+    
+        // read the image file as a data URL.
+        reader.readAsDataURL(this.files[0]);
+    };
+}
+
+function inicializarRecordVideo(){
+    console.log('inicializarRecordVideo()');
+
+    $("#recVideo").click(function(event){
+        $("#inputVideo").click();
+        event.preventDefault();
+    });
+
+    document.getElementById("inputVideo").onchange = function () {
+        var reader = new FileReader();
+        
+        reader.onload = function (e) {
+            // get loaded data and render thumbnail.
+            document.getElementById("videoPreview").src = e.target.result;
+        };
+    
+        // read the image file as a data URL.
+        reader.readAsDataURL(this.files[0]);
+        /*
+        var fileInput = document.getElementById('inputVideo');
+        var fileUrl = window.URL.createObjectURL(fileInput.files[0]);
+        console.log(fileUrl);
+        $("#videoPreview").attr("src", fileUrl);
+        */
+    };
+}
+
+function inicializarRecordAudio(){
+    console.log('inicializarRecordAudio()');
+
+    $("#recAudio").click(function(event){
+        $("#inputAudio").click();
+        event.preventDefault();
+    });
+
+    document.getElementById("inputAudio").onchange = function () {
+        var fileInput = document.getElementById('inputAudio');
+        var fileUrl = window.URL.createObjectURL(fileInput.files[0]);
+        console.log(fileUrl);
+        $("#audioPreview").attr("src", fileUrl);
+    };
+}
+
+function inicializarTakeImageHtml5(){
 
     video = document.getElementById('video');
     canvas = document.getElementById('canvas');
@@ -274,6 +344,16 @@ $(document).one('pagecreate', '#pgEditarRuta', function (ev, ui) {
 $(document).one('pagecreate', '#pgTakeImage', function (ev, ui) {
     inicializarTakeImage();
 })
+
+$(document).one('pagecreate', '#pgRecordVideo', function (ev, ui) {
+    inicializarRecordVideo();
+})
+
+$(document).one('pagecreate', '#pgRecordAudio', function (ev, ui) {
+    inicializarRecordAudio();
+})
+
+
 
 //TODO: faltaría la inicialización relativa a la página de Editar Ruta. Se deja esta labor para el alumno. 
 

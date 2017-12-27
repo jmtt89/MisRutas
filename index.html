@@ -60,7 +60,7 @@
                         <a class="ui-btn" href="#pgTakeImage">Photo</a>
                     </td>
                     <td>
-                        <button >Video</button>
+                        <a class="ui-btn" href="#pgRecordVideo">Video</a>
                     </td>
                 </tr>
                 <tr>
@@ -68,7 +68,7 @@
                         <button >Note</button>
                     </td>
                     <td>
-                        <button>Audio</button>
+                        <a class="ui-btn" href="#pgRecordAudio">Audio</a>
                     </td>
                 </tr>
             </tbody>
@@ -175,23 +175,44 @@
 
     <div id="pgTakeImage" data-role="page">
         <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
-                <h1>Tomar Imagen</h1>
+            <h1>Tomar Imagen</h1>
+        </div>
+        <div class="ui-content">
+            <div class="camera">
+                <video id="video">Video stream not available.</video>
             </div>
-            <div class="ui-content">
-
-                <div class="camera">
-                    <video id="video">Video stream not available.</video>
-                </div>
-                <canvas id="canvas">
-                </canvas>
-                <div class="output">
-                    <img id="photo" alt="The screen capture will appear in this box."> 
-                </div>
-
+            <canvas id="canvas">
+            </canvas>
+            <div class="output">
+                <img id="photo" alt="The screen capture will appear in this box."> 
             </div>
-            <input type="file" accept="image/*;capture=camera">
-            <button id="flip">Flip</button>
-            <button id="takeSnapshot">Take Snapshot</button>
+        </div>
+        <button id="takeSnapshot">Take Snapshot</button>
+        <input id="inputSnapshot" style="display:none" type="file" accept="image/*;capture=camera">
+    </div>
+
+    <div id="pgRecordVideo" data-role="page">
+        <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
+            <h1>Grabar Video</h1>
+        </div>
+        <div class="ui-content">
+            <div class="camera">
+                <video id="videoPreview" controls>Video stream not available.</video>
+            </div>
+        </div>
+        <button id="recVideo">Record Video</button>
+        <input id="inputVideo" style="display:none" type="file" accept="video/*;capture=camcorder">
+    </div>
+
+    <div id="pgRecordAudio" data-role="page">
+        <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
+            <h1>Grabar nota de voz</h1>
+        </div>
+        <div class="ui-content">
+            <audio id="audioPreview"></audio>
+        </div>
+        <button id="recAudio">Record Audio</button>
+        <input id="inputAudio" style="display:none" type="file" accept="audio/*;capture=microphone">
     </div>
 
 </body>
