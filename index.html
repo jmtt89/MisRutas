@@ -3,9 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Mis Rutas</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Chorme & Opera -->
+    <link rel="icon" sizes="192x192" href="img/icon.png">
+
+    <!-- Safari Config -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-startup-image" href="img/icon.png">
+
+    <link rel="apple-touch-icon" href="img/touch-icon-iphone.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="img/touch-icon-ipad.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="img/touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="img/touch-icon-ipad-retina.png">
+
+    
+    <!-- Edge & IE -->
+    <meta name="msapplication-square70x70logo" content="img/icon_small_tile.png">
+    <meta name="msapplication-square150x150logo" content="img/icon_medium_tile.png">
+    <meta name="msapplication-wide310x150logo" content="img/icon_wide_tile.png">
+
     <!--
     <link rel="stylesheet" href="css/jquery.mobile-1.4.5.css" />
     <script src="js/externo/jquery-1.11.1.min.js"></script>
@@ -45,39 +65,43 @@
         <div data-role="header">
             <h1>Mis rutas</h1>
         </div>
-        <div class="ui-content"></div>
-        <input id="txtTitulo" type="text" placeholder="T&iacute;tulo">
-        <input id="btGrabar" type="button" value="Empezar Ruta">
-        <div id="pnInfo">
-            <p id="lblInfo"> Grabando ruta XXX</p>
-            <p id="lblReloj"> 00:00:00 </p>
+        <div class="ui-content">
+            <input id="txtTitulo" type="text" placeholder="T&iacute;tulo">
+            <input id="btGrabar" type="button" value="Empezar Ruta">
+            <div id="pnInfo">
+                <p id="lblInfo"> Grabando ruta XXX</p>
+                <p id="lblReloj"> 00:00:00 </p>
+            </div>
+
+            <div class="timeline">
+            </div>
+                  
         </div>
 
-        <table class="attachMenu">
-            <tbody>
-                <tr>
-                    <td>
-                        <a class="ui-btn" href="#pgTakeImage">Photo</a>
-                    </td>
-                    <td>
-                        <a class="ui-btn" href="#pgRecordVideo">Video</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <button >Note</button>
-                    </td>
-                    <td>
-                        <a class="ui-btn" href="#pgRecordAudio">Audio</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <a>
-            <img>
-        </a>
-
         <div data-role="footer" data-position="fixed">
+            <div style="display:none">
+                <input id="inputSnapshot" style="display:none" type="file" accept="image/*;capture=camera">
+                <input id="inputVideo" style="display:none" type="file" accept="video/*;capture=camcorder">
+                <input id="inputAudio" style="display:none" type="file" accept="audio/*;capture=microphone">
+            </div>
+            <table class="attachMenu">
+                <tbody>
+                    <tr>
+                        <td>
+                            <button id="takeSnapshot" class="ui-btn">Photo</button>
+                        </td>
+                        <td>
+                            <button id="recVideo" class="ui-btn">Video</a>
+                        </td>
+                        <td>
+                            <button >Note</button>
+                        </td>
+                        <td>
+                            <button id="recAudio" class="ui-btn">Audio</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>            
             <div data-role="navbar">
                 <ul>
                     <li>
@@ -98,23 +122,25 @@
         <div data-role="header">
             <h1>Mis rutas</h1>
         </div>
-        <div class="ui-content"></div>
-        <div id="pnRutas">
-            <ul data-role="listview" data-filter="true">
-                <li>
-                    <a id="1" href="#">Ruta 1</a>
-                </li>
-                <li>
-                    <a id="2" href="#">Ruta 2</a>
-                </li>
-                <li>
-                    <a id="3" href="#">Ruta 3</a>
-                </li>
-                <li>
-                    <a id="4" href="#">Ruta 4</a>
-                </li>
-            </ul>
+        <div class="ui-content">
+            <div id="pnRutas">
+                <ul data-role="listview" data-filter="true">
+                    <li>
+                        <a id="1" href="#">Ruta 1</a>
+                    </li>
+                    <li>
+                        <a id="2" href="#">Ruta 2</a>
+                    </li>
+                    <li>
+                        <a id="3" href="#">Ruta 3</a>
+                    </li>
+                    <li>
+                        <a id="4" href="#">Ruta 4</a>
+                    </li>
+                </ul>
+            </div>
         </div>
+
         <div data-role="footer" data-position="fixed">
             <div data-role="navbar">
                 <ul>
@@ -172,51 +198,6 @@
             </div>
         </div>
     </div>
-
-    <div id="pgTakeImage" data-role="page">
-        <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
-            <h1>Tomar Imagen</h1>
-        </div>
-        <div class="ui-content">
-            <div class="camera">
-                <video id="video">Video stream not available.</video>
-            </div>
-            <canvas id="canvas">
-            </canvas>
-            <div class="output">
-                <img id="photo" alt="The screen capture will appear in this box."> 
-            </div>
-        </div>
-        <button id="takeSnapshot">Take Snapshot</button>
-        <input id="inputSnapshot" style="display:none" type="file" accept="image/*;capture=camera">
-    </div>
-
-    <div id="pgRecordVideo" data-role="page">
-        <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
-            <h1>Grabar Video</h1>
-        </div>
-        <div class="ui-content">
-            <div class="camera">
-                <video id="videoPreview" controls>Video stream not available.</video>
-            </div>
-        </div>
-        <button id="recVideo">Record Video</button>
-        <input id="inputVideo" style="display:none" type="file" accept="video/*;capture=camcorder">
-    </div>
-
-    <div id="pgRecordAudio" data-role="page">
-        <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
-            <h1>Grabar nota de voz</h1>
-        </div>
-        <div class="ui-content">
-            <div class="camera">
-                <audio id="audioPreview" controls></audio>
-            </div>
-        </div>
-        <button id="recAudio">Record Audio</button>
-        <input id="inputAudio" style="display:none" type="file" accept="audio/*;capture=microphone">
-    </div>
-
 </body>
 
 </html>

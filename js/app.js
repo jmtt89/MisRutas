@@ -1,22 +1,7 @@
 // tiempo entre lecturas de GPS 
 var GPS_GRAB_TIME = 2000;
 var mapa;
-
-var width = 320;    // We will scale the photo width to this
-var height = 0;     // This will be computed based on the input stream
-
-// |streaming| indicates whether or not we're currently streaming
-// video from the camera. Obviously, we start at false.
-
-var streaming = false;
-
-// The various HTML elements we need to configure or control. These
-// will be set by the startup() function.
-
-var video = null;
-var canvas = null;
-var photo = null;
-var startbutton = null;
+var lastKnowLocation = null;
 
 function inicializarHome() {
     console.log('inicializarHome()');
@@ -75,6 +60,7 @@ function inicializarHome() {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
+                    lastKnowLocation = pos;
                     // add new position to the route
                     rutaEnCurso.posiciones.push(pos);
                 },showError,{
@@ -93,6 +79,37 @@ function inicializarHome() {
             refrescarHome();
         }
     });
+
+    $("#takeSnapshot").click(function(event){
+        $("#inputSnapshot").click();
+        event.preventDefault();
+    });
+
+    $("#recVideo").click(function(event){
+        $("#inputVideo").click();
+        event.preventDefault();
+    });
+
+    $("#recAudio").click(function(event){
+        $("#inputAudio").click();
+        event.preventDefault();
+    });
+
+    document.getElementById("inputSnapshot").onchange = function () {
+        getBase64(this.files[0])
+            .then(data => addMediaElement("IMAGE", data));
+    };
+
+    document.getElementById("inputVideo").onchange = function () {
+        getBase64(this.files[0])
+        .then(data => addMediaElement("VIDEO", data));
+    };
+
+    document.getElementById("inputAudio").onchange = function () {
+        getBase64(this.files[0])
+        .then(data => addMediaElement("AUDIO", data));
+    };
+
     // - refrescar página  
     refrescarHome();
 }
@@ -133,194 +150,29 @@ function inicializarEditarRuta(){
     refrescarEditarRuta();
 }
 
-/*
-function inicializarTakeImage(){
-    console.log('inicializarTakeImage()');
-    
-    front = false;
-
-    Webcam.set({
-        width: 320,
-        height: 240,
-        image_format: 'jpeg',
-        jpeg_quality: 90
-    });
-    Webcam.attach( '#my_camera' );
-    Webcam.set( 'constraints', {
-        width: 1280,
-        height: 720,
-        facingMode: { exact: "environment" }
+function addMediaElement(type, data){
+    rutaEnCurso.mediaElements.push({
+        id: rutaEnCurso.mediaElements.length,
+        title: "Default",
+        type: type,
+        date: new Date().getTime(),
+        location: lastKnowLocation,
+        data: data
     });
 
-    $('#takeSnapshot').click(function(ev){
-        console.log("takeSnapshotClick");
-        Webcam.snap( function(data_uri) {
-            document.getElementById('my_result').innerHTML = '<img src="'+data_uri+'"/>';
-        } );
-        $('#my_camera').hide();
-    });
-
-    $('#flip').click(function(ev){
-        front = !front;
-        Webcam.set( 'constraints', {
-            width: 1280,
-            height: 720,
-            facingMode: { exact: front? "user" : "environment" }
-        });
-    });
-    
-    refrescarTakeImage();
-}
-*/
-
-function inicializarTakeImage(){
-    console.log('inicializarTakeImage()');
-    video = $('#video');
-    canvas = $('#canvas');
-    photo = $('#photo');
-
-    video.hide();
-    canvas.hide();
-
-    $("#takeSnapshot").click(function(event){
-        $("#inputSnapshot").click();
-        event.preventDefault();
-    });
-
-    document.getElementById("inputSnapshot").onchange = function () {
-        var reader = new FileReader();
-    
-        reader.onload = function (e) {
-            // get loaded data and render thumbnail.
-            document.getElementById("photo").src = e.target.result;
-        };
-    
-        // read the image file as a data URL.
-        reader.readAsDataURL(this.files[0]);
-    };
+    //Add UI
+    refrescarHome();
 }
 
-function inicializarRecordVideo(){
-    console.log('inicializarRecordVideo()');
-
-    $("#recVideo").click(function(event){
-        $("#inputVideo").click();
-        event.preventDefault();
-    });
-
-    document.getElementById("inputVideo").onchange = function () {
-        var reader = new FileReader();
-        
-        reader.onload = function (e) {
-            // get loaded data and render thumbnail.
-            document.getElementById("videoPreview").src = e.target.result;
-        };
-    
-        // read the image file as a data URL.
-        reader.readAsDataURL(this.files[0]);
-    };
-}
-
-function inicializarRecordAudio(){
-    console.log('inicializarRecordAudio()');
-
-    $("#recAudio").click(function(event){
-        $("#inputAudio").click();
-        event.preventDefault();
-    });
-
-    document.getElementById("inputAudio").onchange = function () {
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            // get loaded data and render thumbnail.
-            document.getElementById("audioPreview").src = e.target.result;
-        };
-        // read the image file as a data URL.
-        reader.readAsDataURL(this.files[0]);
-    };
-}
-
-function inicializarTakeImageHtml5(){
-
-    video = document.getElementById('video');
-    canvas = document.getElementById('canvas');
-    photo = document.getElementById('photo');
-    startbutton = document.getElementById('takeSnapshot');
-
-    navigator.getMedia = ( navigator.getUserMedia ||
-                           navigator.webkitGetUserMedia ||
-                           navigator.mozGetUserMedia ||
-                           navigator.msGetUserMedia);
-
-    navigator.getMedia(
-      {
-        video: true,
-        audio: false
-      },
-      function(stream) {
-        if (navigator.mozGetUserMedia) {
-          video.mozSrcObject = stream;
-        } else {
-          var vendorURL = window.URL || window.webkitURL;
-          video.src = vendorURL.createObjectURL(stream);
-        }
-        video.play();
-      },
-      function(err) {
-        console.log("An error occured! " + err);
-      }
-    );
-
-    video.addEventListener('canplay', function(ev){
-      if (!streaming) {
-        height = video.videoHeight / (video.videoWidth/width);
-      
-        // Firefox currently has a bug where the height can't be read from
-        // the video, so we will make assumptions if this happens.
-      
-        if (isNaN(height)) {
-          height = width / (4/3);
-        }
-      
-        video.setAttribute('width', width);
-        video.setAttribute('height', height);
-        canvas.setAttribute('width', width);
-        canvas.setAttribute('height', height);
-        streaming = true;
-      }
-    }, false);
-
-    startbutton.addEventListener('click', function(ev){
-      takepicture();
-      ev.preventDefault();
-    }, false);
-    
-    clearphoto();
-    
-}
-
-function clearphoto() {
-    var context = canvas.getContext('2d');
-    context.fillStyle = "#AAA";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    var data = canvas.toDataURL('image/png');
-    photo.setAttribute('src', data);
-}
-
-function takepicture() {
-    var context = canvas.getContext('2d');
-    if (width && height) {
-      canvas.width = width;
-      canvas.height = height;
-      context.drawImage(video, 0, 0, width, height);
-    
-      var data = canvas.toDataURL('image/png');
-      photo.setAttribute('src', data);
-    } else {
-      clearphoto();
+$(function(){
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('sw.js')
+            .then(function() { 
+                console.log('Service Worker Registered'); 
+            });
     }
-}
+})
 
 $(document).one('pagecreate', '#pgHome', function (ev, ui) {
     inicializarHome();
@@ -338,25 +190,12 @@ $(document).one('pagecreate', '#pgEditarRuta', function (ev, ui) {
     inicializarEditarRuta();
 })
 
-$(document).one('pagecreate', '#pgTakeImage', function (ev, ui) {
-    inicializarTakeImage();
-})
-
-$(document).one('pagecreate', '#pgRecordVideo', function (ev, ui) {
-    inicializarRecordVideo();
-})
-
-$(document).one('pagecreate', '#pgRecordAudio', function (ev, ui) {
-    inicializarRecordAudio();
-})
-
-
-
 //TODO: faltaría la inicialización relativa a la página de Editar Ruta. Se deja esta labor para el alumno. 
 
 function refrescarHome() {
     console.log('refrescarHome()');
     if (grabando) {
+        $(".attachMenu").show();
         //$('#txtTitulo').val(rutaEnCurso.titulo).textinput('refresh');
         rutaEnCurso.titulo = $('#txtTitulo').val();
         // mostrar panel    
@@ -369,22 +208,28 @@ function refrescarHome() {
         $('#lblReloj').text("" + (horas < 10 ? "0" : "") + horas + ":" + (minutos < 10 ? "0" : "") + minutos + ":" + (segundos < 10 ? "0" : "") + segundos);
         $('#pnInfo').css('visibility', 'visible');
     } else {
-        // ocultar panel    
+        // ocultar panel 
+        $(".attachMenu").hide();   
         $('#btGrabar').val('Empezar ruta').button('refresh');
         $('#pnInfo').css('visibility', 'hidden');
     }
+    $(".timeline").empty();
+    drawMediaElements();
 }
 
 function refrescarMisRutas() {
     console.log('refrescarMisRutas()');
     // limpiar  
     $('#pnRutas').html('<ul data-role="listview" data-filter="true"></ul>');
-    // pintar rutas  
-    iterarRutas(function (ruta) {
-        var str = '<li><a id="' + ruta.id + '" href="#pgEditarRuta">' + ruta.titulo + '</li>';
-        $('#pnRutas ul').append(str);
+    // pintar rutas
+    listarRutas().then(routes => {
+        for (let i = 0; i < routes.length; i++) {
+            const ruta = routes[i];
+            var str = '<li><a id="' + ruta.id + '" href="#pgEditarRuta">' + ruta.titulo + '</li>';
+            $('#pnRutas ul').append(str);
+        }
+        $('#pnRutas ul').listview();
     });
-    $('#pnRutas ul').listview();
 }
 
 function refrescarMapa() {
@@ -418,10 +263,6 @@ function refrescarMapa() {
 
 function refrescarEditarRuta(){
     console.log('refrescarEditarRuta()');
-}
-
-function refrescarTakeImage(){
-    console.log('refrescarTakeImage()');
 }
 
 //TODO: Nuevamente, resaltar que la rutina de refresco de la página Editar Ruta no ha sido definida. Además, para saltar a dicha página será necesario añadir manejadores para los links listados en la página Mis Rutas. Se deja para el alumno completar dicho código.
@@ -487,6 +328,7 @@ function leerGps() {
         lat: lat,
         lng: lng
     };
+    lastKnowLocation = pos;
     // add new position to the route
     rutaEnCurso.posiciones.push(pos);
 }
@@ -518,5 +360,75 @@ function showError(error) {
         case error.UNKNOWN_ERROR:
             console.log("An unknown error occurred.");
             break;
+    }
+}
+
+function getBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+}
+
+function timeSince(timeStamp) {
+    var now = new Date(),
+      secondsPast = (now.getTime() - timeStamp.getTime()) / 1000;
+    if(secondsPast < 60){
+      return parseInt(secondsPast) + 's';
+    }
+    if(secondsPast < 3600){
+      return parseInt(secondsPast/60) + 'm';
+    }
+    if(secondsPast <= 86400){
+      return parseInt(secondsPast/3600) + 'h';
+    }
+    if(secondsPast > 86400){
+        day = timeStamp.getDate();
+        month = timeStamp.toDateString().match(/ [a-zA-Z]*/)[0].replace(" ","");
+        year = timeStamp.getFullYear() == now.getFullYear() ? "" :  " "+timeStamp.getFullYear();
+        return day + " " + month + year;
+    }
+}
+
+function drawMediaElements(){
+    if(grabando){
+        rutaEnCurso.mediaElements.forEach((element,idx) => {
+            var htmlElement = "";
+            switch (element.type) {
+                case "VIDEO":
+                htmlElement = 
+                `<video controls>  
+                    <source src="${element.data}" type="video/webm">
+                </video>`
+                    break;
+                case "IMAGE":
+                htmlElement = `<img src="${element.data}" />`
+                    break;
+                case "AUDIO":
+                htmlElement = 
+                    `<audio controls>
+                        <source src="${element.data}" /> 
+                    </audio>`
+                    break;
+                case "TEXT":
+                default:
+                    htmlElement = `<span>${element.data}</span>`
+                    break;
+            }
+        
+            //Add UI
+            var pos = idx == 0 ? "left" : "right";
+            var timeSpan = timeSince(new Date(element.date));
+            $(".timeline")
+                .append(
+                `<div class="container ${pos}">
+                    <div class="content">
+                        <h2>${timeSpan}</h2>
+                        ${htmlElement}
+                    </div>
+                </div>`);        
+        });
     }
 }

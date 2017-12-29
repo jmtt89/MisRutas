@@ -1,0 +1,24 @@
+{
+  "name": "misrutas",
+  "version": "1.0.0",
+  "description": "Mis Rutas",
+  "main": "index.html",
+  "dependencies": {},
+  "devDependencies": {
+    "workbox-cli": "^2.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",    
+    "build": "workbox-cli generate:sw"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmtt89/MisRutas.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jmtt89/MisRutas/issues"
+  },
+  "homepage": "https://github.com/jmtt89/MisRutas#readme"
+}
