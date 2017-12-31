@@ -73,6 +73,13 @@
                 <p id="lblReloj"> 00:00:00 </p>
             </div>
 
+            <div id="notePopup" class="myPopup">
+                <label for="myNote" class="ui-hidden-accessible">Nota:</label>
+                <textarea id="myNote" rows="4" cols="50" placeholder="...."></textarea>
+                <button id="addNote" class="ui-btn">Agregar</button>
+                <button id="cancelNote" class="ui-btn">Cancelar</button>
+            </div>
+
             <div class="timeline">
             </div>
                   
@@ -88,13 +95,13 @@
                 <tbody>
                     <tr>
                         <td>
-                            <button id="takeSnapshot" class="ui-btn">Photo</button>
+                            <button id="takeSnapshot" class="ui-btn">Foto</button>
                         </td>
                         <td>
                             <button id="recVideo" class="ui-btn">Video</a>
                         </td>
                         <td>
-                            <button >Note</button>
+                            <button id="takeNote" class="ui-btn">Nota</button>
                         </td>
                         <td>
                             <button id="recAudio" class="ui-btn">Audio</a>
@@ -159,7 +166,9 @@
     </div>
 
     <div id="pgEditarRuta" data-role="page">
-        <div data-role="header" data-add-back-btn="true" data-back-btntext="Atr&aacute;s">
+        <!--div data-role="header" data-add-back-btn="true" data-rel="back" data-back-btntext="Atr&aacute;s"-->
+        <div data-role="header">
+            <a href="#pgMisRutas" data-rel="back" class="ui-btn-left ui-btn ui-icon-back ui-shadow ui-corner-all"  data-role="button" role="button">Atr&aacute;s</a>
             <h1>Editar Ruta</h1>
         </div>
         <div class="ui-content">
@@ -171,6 +180,8 @@
                 <option value="off">Off</option>
                 <option value="on">On</option>
             </select>
+
+            <input id="btEditar" type="button" value="Editar">
             <input id="btBorrar" type="button" value="Borrar"> 
         </div>
     </div>

@@ -50,12 +50,19 @@ function nuevaRuta(route) {
     return route;
 }
 
+function editarRuta(route){
+    console.log('editarRuta(' + JSON.stringify(route) + ')');
+    localStorage.setItem(route.id, JSON.stringify(route));
+    return route;
+}
+
 /* busca una ruta en la bd */
 function buscarRuta(id) {
     console.log('buscarRuta(' + id + ')');
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         var route = localStorage.getItem(id) ? JSON.parse(localStorage.getItem(id)) : null;
         if(route != null){
+            route.mediaElements = route.mediaElements || [];
             var promises = route.mediaElements.map(element => getMediaElementData(route, element));
             Promise
                 .all(promises)
@@ -97,6 +104,7 @@ function listarRutas(){
 
 function loadMediaInfo(route){
     return new Promise((resolve, reject) => {
+        route.mediaElements = route.mediaElements || [];
         var promises = route.mediaElements.map(element => getMediaElementData(route, element));
         Promise
             .all(promises)

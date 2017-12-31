@@ -2,6 +2,7 @@
 var GPS_GRAB_TIME = 2000;
 var mapa;
 var lastKnowLocation = null;
+var lastRouteToEdit = null;
 
 function inicializarHome() {
     console.log('inicializarHome()');
@@ -10,6 +11,9 @@ function inicializarHome() {
     timerReloj = null;
     timerGps = null;
     contadorReloj = null;
+
+    $("#notePopup").hide();
+
     // - registrar manejadores  
     $('#btGrabar').click(function (ev) {
         if (grabando) {
@@ -36,7 +40,6 @@ function inicializarHome() {
         } else {
             rutaEnCurso = new Ruta();
             console.log('empezarRuta(' + rutaEnCurso.id + ')');
-
 
             // recuperar título de la ruta     
             /*
@@ -71,10 +74,6 @@ function inicializarHome() {
                     leerGps();
                 }, GPS_GRAB_TIME);
             }
-
-
-
-
             // refrescar página      
             refrescarHome();
         }
@@ -93,6 +92,23 @@ function inicializarHome() {
     $("#recAudio").click(function(event){
         $("#inputAudio").click();
         event.preventDefault();
+    });
+
+    $("#takeNote").click(function(event){
+        $("#notePopup").show();
+        $("#myNote").val("");
+        event.preventDefault();
+    });
+
+    $("#addNote").click(function(event){
+        event.preventDefault();
+        addMediaElement("TEXT", $("#myNote").val());
+        $("#notePopup").hide();
+    });
+
+    $("#cancelNote").click(function(event){
+        event.preventDefault();
+        $("#notePopup").hide();
     });
 
     document.getElementById("inputSnapshot").onchange = function () {
@@ -147,6 +163,48 @@ function inicializarMapa() {
 function inicializarEditarRuta(){
     console.log('inicializarEditarRuta()');
 
+    $("#btEditar").hide();
+    editRoute = null;
+
+    // Listeners por si cambia
+    $("#txtEditarTitulo").change(function(){
+        if(editRoute != null){
+            editRoute.titulo = this.value;
+            $("#btEditar").show();
+        }
+    });
+
+    $("#txtEditarColor").change(function(){
+        if(editRoute != null){
+        editRoute.color = this.value;
+        $("#btEditar").show();
+        }
+    });
+
+    $("#txtEditarVisualizar").change(function(){
+        if(editRoute != null){
+        editRoute.visible = this.value;
+        $("#btEditar").show();
+        }    
+    });
+
+    //Acciones
+    $("#btEditar").click(function(event){
+        if(editRoute != null){
+            event.preventDefault();
+            editarRuta(editRoute);
+            $.mobile.navigate("#pgMisRutas");
+        }
+    });
+
+    $("#btBorrar").click(function(){
+        if(editRoute != null){
+            event.preventDefault();
+            eliminarRuta(editRoute.id);
+            $.mobile.navigate("#pgMisRutas");
+        }
+    });
+
     refrescarEditarRuta();
 }
 
@@ -180,8 +238,6 @@ $(document).one('pagecreate', '#pgEditarRuta', function (ev, ui) {
     inicializarEditarRuta();
 })
 
-//TODO: faltaría la inicialización relativa a la página de Editar Ruta. Se deja esta labor para el alumno. 
-
 function refrescarHome() {
     console.log('refrescarHome()');
     if (grabando) {
@@ -209,14 +265,19 @@ function refrescarHome() {
 
 function refrescarMisRutas() {
     console.log('refrescarMisRutas()');
-    // limpiar  
+    // limpiar 
     $('#pnRutas').html('<ul data-role="listview" data-filter="true"></ul>');
     // pintar rutas
     listarRutas().then(routes => {
         for (let i = 0; i < routes.length; i++) {
             const ruta = routes[i];
-            var str = '<li><a id="' + ruta.id + '" href="#pgEditarRuta">' + ruta.titulo + '</li>';
+            var str = '<li><a id="ruta_' + ruta.id + '" href="#pgEditarRuta">' + ruta.titulo + '</li>';
             $('#pnRutas ul').append(str);
+
+            $('#ruta_'+ruta.id).click(function(event) {
+                console.log(ruta.id);
+                localStorage.setItem("lastRouteToEdit", ruta.id);
+            });
         }
         $('#pnRutas ul').listview();
     });
@@ -225,6 +286,7 @@ function refrescarMisRutas() {
 function refrescarMapa() {
     console.log('refrescarMapa()');
     if(!mapa) return;
+
     // limpiar todas las rutas pintadas  
     for (var i = 0; i < mapa.polylines.length; i++) mapa.polylines[i].setMap(null);
     mapa.polylines = [];
@@ -235,27 +297,56 @@ function refrescarMapa() {
         for (var i = 0; i < posiciones.length; i++) path.push(new google.maps.LatLng(posiciones[i].lat, posiciones[i].lng));
         return path;
     };
-    iterarRutas(function (ruta) {
-        // sólo si son visibles    
-        if (ruta.visible == 'on') {
-            var polyline = new google.maps.Polyline({
-                path: toPath(ruta.posiciones),
-                map: mapa,
-                strokeColor: ruta.color,
-                strokeOpacity: 1.0,
-                strokeWeight: 4
-            });
-            // guardar información sobre las rutas pintadas      
-            mapa.polylines.push(polyline);
+
+    listarRutas().then(routes => {
+        for (let i = 0; i < routes.length; i++) {
+            const ruta = routes[i];
+            // pintar rutas sólo si son visibles    
+            if (ruta.visible == 'on') {
+                var polyline = new google.maps.Polyline({
+                    path: toPath(ruta.posiciones),
+                    geodesic: true,
+                    map: mapa,
+                    strokeColor: ruta.color,
+                    strokeOpacity: 1.0,
+                    strokeWeight: 4
+                });
+                // guardar información sobre las rutas pintadas      
+                mapa.polylines.push(polyline);
+
+                //Agregar metadatos al mapa
+
+                for(let j=0; j < ruta.mediaElements.length; j++){
+                    var mediaElement = ruta.mediaElements[j];
+                    var mediaMarker = new google.maps.Marker({
+                      position: mediaElement.location,
+                      label: mediaElement.type[0],
+                      map: mapa,
+                    });
+                    var infowindow = new google.maps.InfoWindow({
+                        content: getMapInfo(mediaElement)
+                    });
+                    mediaMarker.addListener('click', function() {
+                        infowindow.open(mapa, mediaMarker);
+                    });
+                }
+            }
         }
     });
 }
 
 function refrescarEditarRuta(){
     console.log('refrescarEditarRuta()');
+    lastRouteToEdit = localStorage.getItem("lastRouteToEdit", 1);
+    buscarRuta(lastRouteToEdit).then(function(ruta){
+        // Setear valores actuales
+        $("#txtEditarTitulo").val(ruta.titulo);
+        $("#txtEditarFecha").val(new Date(ruta.ts).toLocaleString());
+        $("#txtEditarColor").val(ruta.color);
+        $("#txtEditarVisualizar").val(ruta.visible).flipswitch( "refresh" );        
+        editRoute = ruta;
+    });
 }
-
-//TODO: Nuevamente, resaltar que la rutina de refresco de la página Editar Ruta no ha sido definida. Además, para saltar a dicha página será necesario añadir manejadores para los links listados en la página Mis Rutas. Se deja para el alumno completar dicho código.
 
 // refrescar página al saltar a ella 
 $(document).on("pagecontainershow", function (ev, ui) {
@@ -275,8 +366,6 @@ $(document).on("pagecontainershow", function (ev, ui) {
             break;
     }
 })
-
-//TODO: Como puede observarse, no se controla el salto a la página Editar Ruta. De nuevo, se deja para el alumno esta implementación.
 
 /**
  * Esta es una funcion falsa, no toma en consideracion realmente el GPS del dispositivo
@@ -421,4 +510,31 @@ function drawMediaElements(){
                 </div>`);        
         });
     }
+}
+
+function getMapInfo(mediaElement){
+    var htmlElement = "";
+    switch (mediaElement.type) {
+        case "VIDEO":
+        htmlElement = 
+        `<video controls>  
+            <source src="${mediaElement.data}" type="video/webm">
+        </video>`
+            break;
+        case "IMAGE":
+        htmlElement = `<img src="${mediaElement.data}" />`
+            break;
+        case "AUDIO":
+        htmlElement = 
+            `<audio controls>
+                <source src="${mediaElement.data}" /> 
+            </audio>`
+            break;
+        case "TEXT":
+        default:
+            htmlElement = `<span>${mediaElement.data}</span>`
+            break;
+    }
+
+    return `<div class="mapPopup"> ${htmlElement} </div>`;
 }
